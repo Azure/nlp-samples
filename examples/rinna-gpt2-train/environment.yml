@@ -1,0 +1,13 @@
+name: rinna-gpt2
+channels:
+  - conda-forge
+dependencies:
+  - python=3.6
+  - pip
+  - pip:
+    - transformers
+    - scikit-learn
+    - torch
+    - ipywidgets
+    - sentencepiece
+    - azureml-core
