@@ -1,17 +1,16 @@
-  
 # ONNX Runtime Training Module for PyTorch
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
 # Usage
-#   Build: docker build -f Dockerfile.ort-cu102-cudnn7-devel-ubuntu18.04 -t [image-name] .
-#   Run: docker run -it --gpus all --name [run-name] [image-name]:latest /bin/bash 
+#   Build: docker build -f ort-11.1.1-cudnn8-devel-ubuntu18.04-dockerfile -t [image-name] .
+#   Run: docker run -it --gpus all --name [run-name] [image-name]:latest /bin/bash
 # Example:
-#   docker build -f Dockerfile.ort-cu102-cudnn7-devel-ubuntu18.04 -t ort.cu102 .
-#   docker run -it --gpus all --name my-experiments ort.cu102:latest /bin/bash 
+#   docker build -f ort-11.1.1-cudnn8-devel-ubuntu18.04-dockerfile -t ort.cuda11.1 .
+#   docker run -it --gpus all --name my-experiments ort.cuda11.1:latest /bin/bash
 
 # CUDA development image for building sources
-FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04 as builder
+FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04 as builder
 
 # Install and update tools to minimize security vulnerabilities
 RUN apt-get update
@@ -27,11 +26,13 @@ RUN pip install --upgrade pip
 
 # PyTorch
 RUN pip install onnx ninja
-RUN pip install torch==1.8.1+cu102 torchvision==0.9.1+cu102 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 # ORT Module
-RUN pip install onnxruntime-training==1.8.0
+RUN pip install onnxruntime-training==1.8.1 -f https://onnxruntimepackages.z14.web.core.windows.net/onnxruntime_stable_torch190.cu111.html
+
 RUN pip install torch-ort
+RUN python -m torch_ort.configure
 
 WORKDIR /stage
 
@@ -42,8 +43,8 @@ RUN cd /stage && git clone https://github.com/microsoft/huggingface-transformers
     pip install -e .
 
 # Install AzureML support and commonly used packages.
-RUN pip install azureml-defaults wget fairscale
-RUN pip install sacrebleu datasets deepspeed
+# pin datasets==1.9.0 due 'Sequence to truncate too short to respect the provided max_length' on roberta-large 
+RUN pip install azureml-defaults wget fairscale azureml-mlflow
+RUN pip install sacrebleu datasets==1.9.0 deepspeed
 RUN pip install scipy sklearn accelerate
 RUN pip install sentencepiece protobuf
-RUN pip install azureml-mlflow mlflow
