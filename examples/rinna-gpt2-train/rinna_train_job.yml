@@ -1,0 +1,10 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code:
+  local_path: src
+command: >-
+  python train.py --max_steps 50 --output_dir './outputs' --model_name_or_path 'rinna/japanese-gpt2-medium'
+environment: azureml:rinna-docker-env
+compute:
+  target: azureml:gpuinstance
+experiment_name: yaml-rinna-gpt2
+description: cli yaml test for rinna gpt-2 training

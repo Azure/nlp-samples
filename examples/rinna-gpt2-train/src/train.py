@@ -100,20 +100,3 @@ trainer.train()
 
 # モデルの保存
 trainer.save_model()
-
-# モデルの検証
-tokenizer = T5Tokenizer.from_pretrained("rinna/japanese-gpt2-medium", do_lower_case=True)
-model = AutoModelForCausalLM.from_pretrained("./outputs")
-
-input = tokenizer.encode("仕事", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=100, num_return_sequences=100)
-print(tokenizer.batch_decode(output))
-
-input = tokenizer.encode("料理", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=100, num_return_sequences=100)
-print(tokenizer.batch_decode(output))
-
-
-input = tokenizer.encode("握手をしたら、", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=100, num_return_sequences=100)
-print(tokenizer.batch_decode(output))
