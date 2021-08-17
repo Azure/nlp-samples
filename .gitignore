@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#
+examples/rinna-gpt2-predict/config.json
