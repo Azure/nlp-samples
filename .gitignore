@@ -130,3 +130,5 @@ dmypy.json
 
 #
 examples/rinna-gpt2-predict/config.json
+examples/rinna-gpt2-predict/cache_models/
+examples/rinna-gpt2-predict/mlruns/
