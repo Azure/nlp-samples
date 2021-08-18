@@ -2,9 +2,22 @@ $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 code:
   local_path: src
 command: >-
-  python train.py --num_train_epochs 1 --output_dir './outputs' --model_name_or_path 'rinna/japanese-gpt2-medium'
+  python train.py 
+  --learning_rate 2e-5
+  --num_train_epochs 3
+  --ort
+  --output_dir './outputs' 
+  --model_name_or_path 'rinna/japanese-gpt2-medium'
 environment: azureml:rinna-hf-docker-env
+# environment:
+#   docker:
+#     build:
+#       dockerfile: file:Dockerfile
 compute:
   target: azureml:gpu-cluster
+  instance_count : 1
+distribution:
+  type: pytorch
+  process_count: 1
 experiment_name: yaml-rinna-gpt2
-description: cli yaml test for rinna gpt-2 training
+description: Azure ML CLI 2.0 YAML for rinna gpt-2 training
