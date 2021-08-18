@@ -7,10 +7,10 @@ class ONNXrinnaGPT2(mlflow.pyfunc.PythonModel):
         import torch
         self.cache_dir = os.path.join(".", "cache_models")
         self.onnx_bytes = self.get_onnx_bytes(gpt2_onnx_path)
-        #self.ort_session = onnxruntime.InferenceSession(gpt2_onnx_path) 
         # self で InferenceSession を持つと mlflow.pyfunc.save_model の pickle でこける
         # https://github.com/microsoft/onnxruntime/issues/643
         # https://github.com/microsoft/onnxruntime/pull/800
+        self.ort_session = None # 内部的にSessionを保持する場合に使用
         self.model_name_or_path = "rinna/japanese-gpt2-medium"
         self.tokenizer = self.get_tokenizer()
         self.num_layer = 24
@@ -28,6 +28,7 @@ class ONNXrinnaGPT2(mlflow.pyfunc.PythonModel):
     def get_onnx_bytes(self, path):
         with open(path, 'rb') as f:
             return f.read()
+     
         
     def get_tokenizer(self):
         from transformers import T5Tokenizer
@@ -37,7 +38,7 @@ class ONNXrinnaGPT2(mlflow.pyfunc.PythonModel):
         tokenizer.padding_side = "left"
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.do_lower_case = True
-        #okenizer.add_special_tokens({'pad_token': '[PAD]'})
+        #tokenizer.add_special_tokens({'pad_token': '[PAD]'})
         return tokenizer
 
     def get_example_inputs(self, prompt_text):
@@ -185,20 +186,29 @@ class ONNXrinnaGPT2(mlflow.pyfunc.PythonModel):
         batch_size = input_ids.size(0)
         beam_size = self.beam_size
         context_length = input_ids.size(-1)
-
-        ort_session = onnxruntime.InferenceSession(self.onnx_bytes)
+        
+        if self.ort_session == None:
+            ort_session = onnxruntime.InferenceSession(self.onnx_bytes)
         # self で保持すると mlflow.pyfunc.save_model の cloudpickle でこけるため、都度セッションを作成
-        # self.ort_session を使用する場合は下記 ort_session -> self.ort_session に書き換え
+            for step in range(self.num_tokens_to_produce):
+                if self.use_onnxruntime_io:
+                    outputs = self.inference_with_io_binding(ort_session, config, inputs['input_ids'], inputs['position_ids'], inputs['attention_mask'], past, inputs['beam_select_idx'], inputs['input_log_probs'], inputs['input_unfinished_sents'], inputs['prev_step_results'], inputs['prev_step_scores'], step, context_length)
+                else:
+                    outputs = ort_session.run(None, ort_inputs) 
+                inputs, ort_inputs, past = self.update(outputs, step, batch_size, beam_size, context_length, inputs['attention_mask'], self.device)
 
-        for step in range(self.num_tokens_to_produce):
-            if self.use_onnxruntime_io:
-                outputs = self.inference_with_io_binding(ort_session, config, inputs['input_ids'], inputs['position_ids'], inputs['attention_mask'], past, inputs['beam_select_idx'], inputs['input_log_probs'], inputs['input_unfinished_sents'], inputs['prev_step_results'], inputs['prev_step_scores'], step, context_length)
-            else:
-                outputs = ort_session.run(None, ort_inputs) 
-            inputs, ort_inputs, past = self.update(outputs, step, batch_size, beam_size, context_length, inputs['attention_mask'], self.device)
+                if not inputs['input_unfinished_sents'].any():
+                    break
+        else:
+            for step in range(self.num_tokens_to_produce):
+                if self.use_onnxruntime_io:
+                    outputs = self.inference_with_io_binding(self.ort_session, config, inputs['input_ids'], inputs['position_ids'], inputs['attention_mask'], past, inputs['beam_select_idx'], inputs['input_log_probs'], inputs['input_unfinished_sents'], inputs['prev_step_results'], inputs['prev_step_scores'], step, context_length)
+                else:
+                    outputs = self.ort_session.run(None, ort_inputs) 
+                inputs, ort_inputs, past = self.update(outputs, step, batch_size, beam_size, context_length, inputs['attention_mask'], self.device)
 
-            if not inputs['input_unfinished_sents'].any():
-                break
+                if not inputs['input_unfinished_sents'].any():
+                    break
 
         predict_sentences = [self.tokenizer.decode(candidate, skip_special_tokens=True) for candidate in inputs['prev_step_results']]
         
