@@ -31,14 +31,16 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # 引数
 parser = argparse.ArgumentParser()
+parser.add_argument('--learning_rate', type=float, default=2e-5)
 parser.add_argument('--num_train_epochs', type=int, default=1)
+parser.add_argument('--ort', action='store_true')
 parser.add_argument('--output_dir', type=str)
-parser.add_argument('--model_name_or_path', default='rinna/japanese-gpt2-medium')
+parser.add_argument('--model_name_or_path', type=str, default='rinna/japanese-gpt2-medium')
 args = parser.parse_args()
 
 
 # パラメータ
-block_size = 128
+block_size = 32
 
 # mlflow でログを取るための callback クラス
 class MyCallback(TrainerCallback):
@@ -108,6 +110,7 @@ lm_datasets = tokenized_datasets.map(
     batch_size=1000,
     num_proc=4,
 )
+print(lm_datasets)
 
 assert len(lm_datasets["train"][0]["attention_mask"]) == block_size
 
@@ -118,7 +121,7 @@ print(tokenizer.decode(lm_datasets["train"][1]["input_ids"]))
 # 学習済みモデル試行
 model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path)
 input = tokenizer.encode("こんにちは、", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=64, num_return_sequences=100)
+output = model.generate(input, do_sample=True, max_length=32, num_return_sequences=100)
 print(tokenizer.batch_decode(output))
 
 
@@ -128,17 +131,18 @@ model_name = args.model_name_or_path.split("/")[-1]
 training_args = TrainingArguments(
     output_dir="outputs", 
     overwrite_output_dir=True, 
-    per_device_train_batch_size=1,
-    per_device_eval_batch_size=1,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
     do_train=True,
     do_eval=True,
     evaluation_strategy="steps",
     eval_steps=100,
-    fp16=True,
-    learning_rate=2e-5,
+    #fp16=True,
+    learning_rate=args.learning_rate,
     num_train_epochs=args.num_train_epochs,
     report_to=["none"],
-    ort=True,
+    ort=args.ort,
+    weight_decay=0.01
     )
 
 
@@ -152,11 +156,13 @@ trainer = Trainer(
 
 # モデル学習開始
 with mlflow.start_run() as run:  
+    mlflow.log_param('learning rate', args.learning_rate)
+    mlflow.log_param('num_train_epochs', args.num_train_epochs)
+    mlflow.log_param('model_name', args.model_name_or_path)
+    mlflow.log_param('ort', args.ort)
     trainer.train()
-    
     # モデルの保存
     trainer.save_model("outputs/models")
-
     # mlflow api でのモデル登録
     model_uri = run.info.artifact_uri + '/outputs/models'
     mlflow.log_artifacts("outputs/models", artifact_path="outputs/models") 
@@ -166,5 +172,5 @@ with mlflow.start_run() as run:
 # モデルのテスト
 model = AutoModelForCausalLM.from_pretrained("outputs/models")
 input = tokenizer.encode("こんにちは、", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=64, num_return_sequences=100)
+output = model.generate(input, do_sample=True, max_length=32, num_return_sequences=100)
 print(tokenizer.batch_decode(output))
