@@ -2,6 +2,13 @@
 
 This repo is a collection of NLP samples on Azure, especially for Japanese.
 
+## Examples
+
+|scenario |description|
+|---------|-----------|
+|[rinna GPT-2 train](./examples/rinna-gpt2-train)|Fine-Tune rinna GPT-2 model with ONNX Runtime|
+|[rinna GPT-2 predict](./examples/rinna-gpt2-predict)|Convert rinna GPT-2 Model to ONNX with Quantization|
+
 
 ## Contributing
 
