@@ -3,7 +3,5 @@ name: rinna-hf-docker-env
 version: 1
 docker:
   build:
-    dockerfile: 'Dockerfile'
-  # image: mcr.microsoft.com/azureml/openmpi3.1.2-ubuntu18.04s
-# conda_file: file:conda-envs/python-ml-basic-cpu.yml
-#description: Environment asset created from a base Docker image plus a Conda environment file.
+    dockerfile: file:Dockerfile
+description: Environment asset created from DockerFile
