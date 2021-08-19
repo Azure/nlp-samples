@@ -196,7 +196,7 @@ def init():
     # AZUREML_MODEL_DIR is an environment variable created during deployment.
     # It is the path to the model folder (./azureml-models/$MODEL_NAME/$VERSION)
     # For multiple models, it points to the folder containing all deployed models (./azureml-models)
-    model_path = os.path.join(os.getenv('AZUREML_MODEL_DIR'), 'rinna_gpt2_beam_step_search_optimized_gpt2_int8.onnx')
+    model_path = os.path.join(os.getenv('AZUREML_MODEL_DIR'), 'rinna_gpt2_beam_step_search_optimized_int8.onnx')
     onnx_gpt2 = ONNXrinnaGPT2(model_path)
     #onnx_gpt2.pre_load_ort() 
 
