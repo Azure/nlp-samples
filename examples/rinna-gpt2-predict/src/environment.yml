@@ -1,0 +1,29 @@
+name: gpt2_predict_env
+dependencies:
+- python=3.8.10
+- pip:
+    - mlflow
+    - cloudpickle==1.6.0
+    - numpy
+    - torch==1.9.0
+    - torchvision==0.10.0
+    - onnxruntime==1.8.1
+    - sentencepiece
+    - transformers==4.8.2
+    - onnx
+    - onnxconverter_common
+    - psutil
+    - pytz
+    - pandas
+    - py-cpuinfo
+    - py3nvml
+    - sympy
+    - coloredlogs
+    - azureml-core
+    - azureml-mlflow
+    - applicationinsights
+    - werkzeug==2.0.1
+    - flask==1.1.4
+channels:
+- anaconda
+- conda-forge
