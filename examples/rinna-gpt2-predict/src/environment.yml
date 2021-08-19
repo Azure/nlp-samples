@@ -21,9 +21,9 @@ dependencies:
     - coloredlogs
     - azureml-core
     - azureml-mlflow
-    - applicationinsights
-    - werkzeug==2.0.1
-    - flask==1.1.4
+    - applicationinsights # 以下無いとエラー
+    - werkzeug==2.0.1 
+    - flask==1.1.4 
 channels:
 - anaconda
 - conda-forge
