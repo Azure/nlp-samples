@@ -1,0 +1,20 @@
+name: MLOps-CICD
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Install Azure ML CLI 2.0
+        run: az extension add -n ml -y
+      - name: Check Azure Subscription
+        run: az account show -o table
