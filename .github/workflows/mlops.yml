@@ -18,3 +18,5 @@ jobs:
         run: az extension add -n ml -y
       - name: Check Azure Subscription
         run: az account show -o table
+      - name: Train Model
+        run: az ml job create --file ./examples/rinna-gpt2-train/cli/rinna_trainer_job.yml
