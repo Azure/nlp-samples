@@ -2,7 +2,7 @@ name: MLOps-CICD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ gh-actions ]
   workflow_dispatch:
 
 jobs:
