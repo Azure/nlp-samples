@@ -32,9 +32,9 @@ if __name__ == '__main__':
     cred = json.loads(azure_credentials)
 
     sp = ServicePrincipalAuthentication(
-        tenant_id=cred.tenantId,
-        service_principal_id=cred.clientId,
-        service_principal_password=cred.clientSecret
+        tenant_id=cred["tenantId"],
+        service_principal_id=cred["clientId"],
+        service_principal_password=cred["clientSecret"]
     )
     ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred.subscriptionId)
 
