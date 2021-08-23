@@ -22,7 +22,6 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: exec_gpt2_convert_env
-      - name: Install packages
-        run: conda install --name exec_gpt2_convert_env --file examples/rinna-gpt2-predict/src/exec_env.yml
+          environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
       - name: Convert
         run: cd ./examples/rinna-gpt2-predict/src/ && python convert_onnx.ipynb

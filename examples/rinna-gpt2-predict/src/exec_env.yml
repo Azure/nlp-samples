@@ -1,4 +1,4 @@
-name: exec_gpt2_convert_env
+#name: exec_gpt2_convert_env
 dependencies:
 - python=3.8.10
 - pip:
