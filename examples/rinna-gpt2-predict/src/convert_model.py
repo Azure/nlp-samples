@@ -6,6 +6,7 @@ import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--rg', default='mlops')
     parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
     parser.add_argument('--version', type=int, default=37)
@@ -36,7 +37,7 @@ if __name__ == '__main__':
         service_principal_id=cred["clientId"],
         service_principal_password=cred["clientSecret"]
     )
-    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred["subscriptionId"])
+    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred["subscriptionId"], resource_group=args.rg)
 
     # AML 上で実行する場合は上記2行コメントアウト、以下実行
     # ws = Workspace.from_config()
