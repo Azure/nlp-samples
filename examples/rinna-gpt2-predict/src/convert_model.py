@@ -28,7 +28,9 @@ if __name__ == '__main__':
     import mlflow
     import json
     from azureml.core.authentication import ServicePrincipalAuthentication
-
+    
+    print(args.credential)
+    print(type(args.credential))
     cred = json.loads(args.credential)
 
     sp = ServicePrincipalAuthentication(
