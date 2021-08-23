@@ -6,6 +6,8 @@ import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--credential')
+    parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
     parser.add_argument('--cluster', default='aml-cluster')
     parser.add_argument('--name', default='rinna-gpt2-aks')
@@ -27,8 +29,17 @@ if __name__ == '__main__':
     import json
     import requests
 
-    ws = Workspace.from_config()
-    ws
+    from azureml.core.authentication import ServicePrincipalAuthentication
+
+    cred = json.load(arg.credentials)
+
+    sp = ServicePrincipalAuthentication(
+        tenant_id=cred.tenantId,
+        service_principal_id=cred.clientId,
+        service_principal_password=cred.clientSecret
+    )
+    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred.subscriptionId)
+    
 
     # 推論環境の定義ファイル生成と環境設定
 

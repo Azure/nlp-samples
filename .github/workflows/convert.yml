@@ -14,14 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: exec_gpt2_convert_env
           environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
       - name: Convert
-        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python convert_model.py
+        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python convert_model.py --credential ${{ secrets.AZURE_CREDENTIALS }}

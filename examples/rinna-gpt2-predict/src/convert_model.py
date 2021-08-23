@@ -6,6 +6,8 @@ import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--credential')
+    parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
     parser.add_argument('--version', type=int, default=37)
     parser.add_argument('--save', default='rinna-GPT2-quantized-model')
@@ -24,9 +26,17 @@ if __name__ == '__main__':
     from azureml.core.runconfig import PyTorchConfiguration
     from azureml.core.authentication import InteractiveLoginAuthentication
     import mlflow
+    import json
+    from azureml.core.authentication import ServicePrincipalAuthentication
 
-    #interactive_auth = InteractiveLoginAuthentication(force=True,tenant_id="72f988bf-86f1-41af-91ab-2d7cd011db47")
-    ws = Workspace.from_config()
+    cred = json.load(arg.credentials)
+
+    sp = ServicePrincipalAuthentication(
+        tenant_id=cred.tenantId,
+        service_principal_id=cred.clientId,
+        service_principal_password=cred.clientSecret
+    )
+    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred.subscriptionId)
 
     # AML 上で実行する場合は上記2行コメントアウト、以下実行
     # ws = Workspace.from_config()
