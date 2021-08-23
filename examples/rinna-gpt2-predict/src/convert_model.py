@@ -37,8 +37,10 @@ if __name__ == '__main__':
     # ## モデル読み込み
 
     client = mlflow.tracking.MlflowClient()
-
-    registered_model = client.get_model_version(name=args.model, version=args.version)
+    if args.version:
+        registered_model = client.get_model_version(name=args.model, version=args.version)
+    else:
+        registered_model = client.get_latest_versions(name=args.model)
     client.download_artifacts(registered_model.run_id, 'outputs/models', cache_dir)
 
     # GPT-2 モデルにビームサーチを組み合わせるヘルパー class で読み込んだ GPT-2 モデルをラップ
