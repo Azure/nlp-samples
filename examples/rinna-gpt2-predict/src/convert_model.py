@@ -36,7 +36,7 @@ if __name__ == '__main__':
         service_principal_id=cred["clientId"],
         service_principal_password=cred["clientSecret"]
     )
-    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred.subscriptionId)
+    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred["subscriptionId"])
 
     # AML 上で実行する場合は上記2行コメントアウト、以下実行
     # ws = Workspace.from_config()

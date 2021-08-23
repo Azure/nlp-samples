@@ -31,14 +31,15 @@ if __name__ == '__main__':
 
     from azureml.core.authentication import ServicePrincipalAuthentication
 
-    cred = json.loads(args.credential)
+    azure_credentials = os.environ.get("AZURE_CREDENTIALS", default="{}")
+    cred = json.loads(azure_credentials)
 
     sp = ServicePrincipalAuthentication(
-        tenant_id=cred.tenantId,
-        service_principal_id=cred.clientId,
-        service_principal_password=cred.clientSecret
+        tenant_id=cred["tenantId"],
+        service_principal_id=cred["clientId"],
+        service_principal_password=cred["clientSecret"]
     )
-    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred.subscriptionId)
+    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred["subscriptionId"])
     
 
     # 推論環境の定義ファイル生成と環境設定
