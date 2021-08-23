@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     # 推論環境の定義ファイル生成と環境設定
 
-    env_file_path = os.path.join("src", "environment.yml")
-    score_file_path = os.path.join("src", "score.py")
+    env_file_path = os.path.join("environment.yml")
+    score_file_path = os.path.join("score.py")
 
     env = Environment.from_conda_specification(name="rinna-predict-env", file_path=env_file_path)
     env.register(ws)
