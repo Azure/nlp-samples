@@ -10,7 +10,7 @@ if __name__ == '__main__':
     parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
     parser.add_argument('--cluster', default='aml-cluster')
-    parser.add_argument('--name', default='rinna-gpt2-aks')
+    parser.add_argument('--name', default='rinna-gpt2-aks-mlops')
     args = parser.parse_args()
 
 
