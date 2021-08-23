@@ -21,4 +21,4 @@ jobs:
       - name: Default Azure ML Workspace
         run: az configure --defaults group="mlops" workspace="azureml-mlops"
       - name: Train Model
-        run: az ml job create --file ./examples/rinna-gpt2-train/cli/rinna_trainer_job.yml --web
+        run: az ml job create --file ./examples/rinna-gpt2-train/cli/rinna_trainer_job.yml --web --stream
