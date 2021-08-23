@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     from azureml.core.authentication import ServicePrincipalAuthentication
 
-    cred = json.load(args.credential)
+    cred = json.loads(args.credential)
 
     sp = ServicePrincipalAuthentication(
         tenant_id=cred.tenantId,
