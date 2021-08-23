@@ -2,6 +2,9 @@
 
 name: Convert
 
+env:
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
 # Controls when the workflow will run
 on:
   push:
@@ -20,4 +23,4 @@ jobs:
           activate-environment: exec_gpt2_convert_env
           environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
       - name: Convert
-        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python convert_model.py --credential ${{ secrets.TEST }}
+        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python convert_model.py

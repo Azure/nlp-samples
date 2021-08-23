@@ -6,7 +6,6 @@ import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--credential')
     parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
     parser.add_argument('--version', type=int, default=37)
@@ -29,9 +28,8 @@ if __name__ == '__main__':
     import json
     from azureml.core.authentication import ServicePrincipalAuthentication
     
-    print(args.credential)
-    print(type(args.credential))
-    cred = json.loads(args.credential)
+    azure_credentials = os.environ.get("AZURE_CREDENTIALS", default="{}")
+    cred = json.loads(azure_credentials)
 
     sp = ServicePrincipalAuthentication(
         tenant_id=cred.tenantId,
