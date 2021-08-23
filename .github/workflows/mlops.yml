@@ -1,12 +1,17 @@
 name: MLOps-CICD
 
+env:
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
 on:
   push:
-    branches: [ gh-actions ]
+    branches: 
+      - gh-actions
+      - convert-and-deploy-from-ga
   workflow_dispatch:
 
 jobs:
-  build:
+  train:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,3 +27,29 @@ jobs:
         run: az configure --defaults group="mlops" workspace="azureml-mlops"
       - name: Train Model
         run: az ml job create --file ./examples/rinna-gpt2-train/cli/rinna_trainer_job.yml
+  
+  convert:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: exec_gpt2_convert_env
+          environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
+      - name: Convert
+        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python convert_model.py
+
+  deploy:
+    needs: convert
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: exec_gpt2_convert_env
+          environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
+      - name: Convert
+        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python deploy_onnx.py

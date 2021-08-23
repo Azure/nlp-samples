@@ -6,7 +6,7 @@ import sys
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--credential')
+    parser.add_argument('--rg', default='mlops')
     parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
     parser.add_argument('--cluster', default='aml-cluster')
@@ -31,6 +31,7 @@ if __name__ == '__main__':
 
     from azureml.core.authentication import ServicePrincipalAuthentication
 
+    print('Connecting Azure ML Workspace')
     azure_credentials = os.environ.get("AZURE_CREDENTIALS", default="{}")
     cred = json.loads(azure_credentials)
 
@@ -39,7 +40,7 @@ if __name__ == '__main__':
         service_principal_id=cred["clientId"],
         service_principal_password=cred["clientSecret"]
     )
-    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred["subscriptionId"])
+    ws = Workspace.get(name=args.workspace, auth=sp, subscription_id=cred["subscriptionId"], resource_group=args.rg)
     
 
     # 推論環境の定義ファイル生成と環境設定

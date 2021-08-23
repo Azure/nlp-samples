@@ -9,7 +9,7 @@ if __name__ == '__main__':
     parser.add_argument('--rg', default='mlops')
     parser.add_argument('--workspace', default="azureml-mlops")
     parser.add_argument('--model', default='test-model')
-    parser.add_argument('--version', type=int, default=37)
+    parser.add_argument('--version')
     parser.add_argument('--save', default='rinna-GPT2-quantized-model')
     args = parser.parse_args()
 
@@ -29,6 +29,7 @@ if __name__ == '__main__':
     import json
     from azureml.core.authentication import ServicePrincipalAuthentication
     
+    print('Connecting Azure ML Workspace')
     azure_credentials = os.environ.get("AZURE_CREDENTIALS", default="{}")
     cred = json.loads(azure_credentials)
 
@@ -46,6 +47,8 @@ if __name__ == '__main__':
 
 
     # ## モデル読み込み
+
+    print('Loading trained model')
 
     client = mlflow.tracking.MlflowClient()
     if args.version:
