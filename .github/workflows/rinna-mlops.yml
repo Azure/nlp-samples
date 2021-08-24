@@ -6,8 +6,7 @@ env:
 on:
   push:
     branches: 
-      - gh-actions
-      - convert-and-deploy-from-ga
+      - main
   workflow_dispatch:
 
 jobs:
