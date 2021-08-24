@@ -1,4 +1,4 @@
-name: MLOps-CICD
+name: rinna-MLOps
 
 env:
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
