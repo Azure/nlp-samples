@@ -4,11 +4,11 @@ code:
 command: >-
   python train.py 
   --learning_rate 2e-5
-  --num_train_epochs 3
+  --num_train_epochs 2
   --ort
   --output_dir './outputs' 
   --model_name_or_path 'rinna/japanese-gpt2-medium'
-environment: azureml:rinna-hf-docker-env
+environment: azureml:rinna-hf-docker-env 
 # environment:
 #   docker:
 #     build:

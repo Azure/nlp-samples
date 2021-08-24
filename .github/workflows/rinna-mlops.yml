@@ -1,0 +1,54 @@
+name: rinna-MLOps
+
+env:
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+on:
+  push:
+    branches: 
+      - main
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Install Azure ML CLI 2.0
+        run: az extension add -n ml -y
+      - name: Check Azure Subscription
+        run: az account show -o table
+      - name: Default Azure ML Workspace
+        run: az configure --defaults group="mlops" workspace="azureml-mlops"
+      - name: Train Model
+        run: az ml job create --file ./examples/rinna-gpt2-train/cli/rinna_trainer_job.yml
+  
+  convert:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: exec_gpt2_convert_env
+          environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
+      - name: Convert
+        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python convert_model.py
+
+  deploy:
+    needs: convert
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: exec_gpt2_convert_env
+          environment-file: examples/rinna-gpt2-predict/src/exec_env.yml
+      - name: Convert
+        run: cd ./examples/rinna-gpt2-predict/src/ && /usr/share/miniconda/envs/exec_gpt2_convert_env/bin/python deploy_onnx.py

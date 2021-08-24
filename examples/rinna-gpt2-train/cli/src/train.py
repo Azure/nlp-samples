@@ -138,10 +138,10 @@ training_args = TrainingArguments(
     evaluation_strategy="steps",
     eval_steps=100,
     #fp16=True,
-    learning_rate=args.learning_rate,
-    num_train_epochs=args.num_train_epochs,
-    report_to=["none"],
-    ort=args.ort,
+    learning_rate=args.learning_rate, # 学習率
+    num_train_epochs=args.num_train_epochs, # エポック数
+    report_to=["none"], # 独自実装の mlflow callback を利用するため
+    ort=args.ort, # ONNX Runtime による学習高速化
     weight_decay=0.01
     )
 
@@ -151,7 +151,7 @@ trainer = Trainer(
     args=training_args,
     train_dataset=lm_datasets["train"],
     eval_dataset=lm_datasets["validation"],
-    callbacks=[MyCallback]
+    callbacks=[MyCallback] # mlflow の callback を設定
 )
 
 # モデル学習開始
@@ -159,7 +159,7 @@ with mlflow.start_run() as run:
     mlflow.log_param('learning rate', args.learning_rate)
     mlflow.log_param('num_train_epochs', args.num_train_epochs)
     mlflow.log_param('model_name', args.model_name_or_path)
-    mlflow.log_param('ort', args.ort)
+    mlflow.log_param('ort', args.ort)  # ONNX Runtime による学習高速化
     trainer.train()
     # モデルの保存
     trainer.save_model("outputs/models")
