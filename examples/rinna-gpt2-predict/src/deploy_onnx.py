@@ -70,7 +70,15 @@ if __name__ == '__main__':
     print('Deploy ONNX model as API on AKS')
     service_name = args.name
     print("Service", service_name)
-    webservice = Model.deploy(ws, service_name, [model], inference_config, deploy_config, target_aks)
+    webservice = Model.deploy(
+        workspace=ws,
+        name=service_name,
+        models=[model],
+        inference_config=inference_config,
+        deployment_config=deploy_config,
+        deployment_target=target_aks,
+        overwrite=True
+    )
     webservice.wait_for_deployment(True)
     print(webservice.state)
 
