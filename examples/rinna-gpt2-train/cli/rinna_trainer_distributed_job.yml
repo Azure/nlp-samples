@@ -1,0 +1,42 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code:
+  local_path: src
+command: >-
+  python -m torch.distributed.launch --nproc_per_node 4 rinna_clm.py
+  --model_name_or_path "rinna/japanese-gpt2-medium"
+  --train_file {inputs.train_data}
+  --validation_file {inputs.test_data}
+  --do_train
+  --do_eval
+  --evaluation_strategy "epoch"
+  --block_size 128
+  --learning_rate 2e-6
+  --num_train_epochs 30
+  --save_steps 500
+  --save_total_limit 3
+  --per_device_train_batch_size 4
+  --per_device_eval_batch_size 4
+  --output_dir './outputs'
+  --ort True
+  --report_to none
+  --use_fast_tokenizer False
+inputs:
+  train_data:
+    data: azureml:train
+    mode: download
+  test_data:
+    data: azureml:test
+    mode: download
+environment: azureml:rinna-hf-docker-env 
+# environment:
+#   docker:
+#     build:
+#       dockerfile: file:Dockerfile
+compute:
+  target: azureml:gpu-nc24s # multiple gpus in a cluster
+  instance_count : 1
+distribution:
+  type: pytorch
+  process_count: 1
+experiment_name: yaml-rinna-gpt2-clm-distributed
+description: Azure ML CLI 2.0 YAML for rinna gpt-2 training (rinna_clm.py) with distributed training
