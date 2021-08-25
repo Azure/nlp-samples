@@ -31,6 +31,8 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # 引数
 parser = argparse.ArgumentParser()
+parser.add_argument('--train_file', type=str, default="train.txt")
+parser.add_argument('--validate_file', type=str, default="test.txt")
 parser.add_argument('--learning_rate', type=float, default=2e-5)
 parser.add_argument('--num_train_epochs', type=int, default=1)
 parser.add_argument('--ort', action='store_true')
@@ -92,10 +94,10 @@ dataset.download(target_path='.', overwrite=False)
 dataset = Dataset.get_by_name(ws, name='test')
 dataset.download(target_path='.', overwrite=False)
 
-train_path = 'train.txt'
-test_path = 'test.txt'
+train_path = args.train_file
+test_path = args.validate_file
 
-datasets = load_dataset("text", data_files={"train": 'train.txt', "validation": 'test.txt'})
+datasets = load_dataset("text", data_files={"train": train_path, "validation": test_path})
 
 
 # データ前処理
@@ -121,7 +123,7 @@ print(tokenizer.decode(lm_datasets["train"][1]["input_ids"]))
 # 学習済みモデル試行
 model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path)
 input = tokenizer.encode("こんにちは、", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=32, num_return_sequences=100)
+output = model.generate(input, do_sample=True, max_length=32, num_return_sequences=100, bad_words_ids=[[1],[2],[5]])
 print(tokenizer.batch_decode(output))
 
 
@@ -172,5 +174,5 @@ with mlflow.start_run() as run:
 # モデルのテスト
 model = AutoModelForCausalLM.from_pretrained("outputs/models")
 input = tokenizer.encode("こんにちは、", return_tensors="pt")
-output = model.generate(input, do_sample=True, max_length=32, num_return_sequences=100)
+output = model.generate(input, do_sample=True, max_length=32, num_return_sequences=100, bad_words_ids=[[1],[2],[5]])
 print(tokenizer.batch_decode(output))
