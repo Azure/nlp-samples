@@ -9,8 +9,6 @@ from . import datasets, models
 
 # seed
 pl.seed_everything(1234)
-torch.manual_seed(1234)
-np.random.seed(1234)
 
 # device (cpu or gpu)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
