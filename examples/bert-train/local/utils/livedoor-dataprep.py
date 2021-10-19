@@ -8,7 +8,7 @@ import urllib.request
 
 DOWNLOAD = True
 EXTRACT = True
-DATA_DIR = "../data"
+DATA_DIR = "./data"
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 INTERIM_DIR = os.path.join(DATA_DIR, "interim")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
